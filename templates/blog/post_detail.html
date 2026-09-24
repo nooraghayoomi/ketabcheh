@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ post.title }} | وبلاگ کتابچه{% endblock %}
+
+{% block content %}
+
+<article class="max-w-3xl mx-auto px-6 py-12">
+
+  <!-- هدر پست -->
+  <header class="mb-10 text-center">
+    <h1 class="text-3xl md:text-4xl font-bold text-wine mb-4 leading-tight">
+      {{ post.title }}
+    </h1>
+    
+    <div class="flex flex-wrap items-center justify-center gap-4 text-sm text-ink/50">
+      <span>✍️ {{ post.author.get_display_name }}</span>
+      <span>📅 {{ post.published_at|date:"Y/m/d" }}</span>
+      <span>⏱ {{ post.reading_time }} دقیقه مطالعه</span>
+      <span>👁 {{ post.views }} بازدید</span>
+    </div>
+  </header>
+
+  <!-- کاور -->
+  {% if post.cover %}
+    <div class="mb-10 rounded-2xl overflow-hidden shadow-lg">
+      <img src="{{ post.cover.url }}" alt="{{ post.title }}" class="w-full">
+    </div>
+  {% endif %}
+
+  <!-- محتوا -->
+  <div class="prose prose-lg max-w-none text-ink/85 leading-loose">
+    {{ post.content|linebreaks }}
+  </div>
+
+  <!-- اشتراک‌گذاری -->
+  <div class="mt-12 pt-8 border-t border-gold/20 text-center">
+    <p class="text-sm text-ink/50 mb-3">این مطلب رو به اشتراک بذار:</p>
+    <div class="flex justify-center gap-2">
+      <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ post.title }}" 
+         target="_blank"
+         class="px-4 py-2 rounded-full bg-wine/10 text-wine hover:bg-wine hover:text-cream text-xs transition">
+        توییتر
+      </a>
+      <a href="https://t.me/share/url?url={{ request.build_absolute_uri }}&text={{ post.title }}" 
+         target="_blank"
+         class="px-4 py-2 rounded-full bg-wine/10 text-wine hover:bg-wine hover:text-cream text-xs transition">
+        تلگرام
+      </a>
+      <a href="https://wa.me/?text={{ post.title }} {{ request.build_absolute_uri }}" 
+         target="_blank"
+         class="px-4 py-2 rounded-full bg-wine/10 text-wine hover:bg-wine hover:text-cream text-xs transition">
+        واتساپ
+      </a>
+    </div>
+  </div>
+
+  <!-- پست‌های مرتبط -->
+  {% if related_posts %}
+    <div class="mt-16">
+      <h2 class="text-xl font-bold text-wine mb-5">📚 مطالب مرتبط</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {% for related in related_posts %}
+          <a href="{{ related.get_absolute_url }}" 
+             class="bg-white rounded-2xl p-4 border border-gold/10 hover:shadow-md transition group">
+            <h3 class="font-bold text-ink text-sm mb-2 group-hover:text-wine transition leading-snug">
+              {{ related.title }}
+            </h3>
+            <p class="text-xs text-ink/50">{{ related.published_at|date:"Y/m/d" }}</p>
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- بازگشت -->
+  <div class="mt-12 text-center">
+    <a href="{% url 'blog:list' %}" 
+       class="inline-block text-sm text-wine hover:text-gold transition">
+      ← بازگشت به وبلاگ
+    </a>
+  </div>
+
+</article>
+
+{% endblock %}

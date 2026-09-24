@@ -52,9 +52,10 @@
         <span class="font-bold text-lg text-wine">کتابچه</span>
       </a>
 
-      <nav class="hidden md:flex items-center gap-5 text-sm flex-shrink-0">
+      <nav class="hidden md:flex items-center gap-7 text-sm">
         <a href="{% url 'home' %}" class="text-ink/70 hover:text-wine transition">خانه</a>
         <a href="{% url 'stories:list' %}" class="text-ink/70 hover:text-wine transition">داستان‌ها</a>
+        <a href="{% url 'blog:list' %}" class="text-ink/70 hover:text-wine transition">وبلاگ</a>  <!-- ← این خط -->
       </nav>
 
       <form method="get" action="{% url 'stories:search' %}" class="hidden md:flex items-center flex-1 max-w-md">

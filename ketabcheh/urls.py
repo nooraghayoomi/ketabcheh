@@ -10,7 +10,7 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('stories/', include('stories.urls')),
     path('notifications/', include('notifications.urls')),
-    path('reports/', include('reports.urls')),
+    path('blog/', include('blog.urls')),  # ← این خط باید باشه
     path('', views.home_view, name='home'),
 ]
 

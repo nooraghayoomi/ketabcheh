@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     'stories',
     'notifications',
     'reports', 
+    'blog',
 ]
 
 MIDDLEWARE = [
