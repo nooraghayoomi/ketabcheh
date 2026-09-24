@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ profile_user.username }} | کتابچه{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-6 py-12">
+
+  <div class="bg-white rounded-3xl p-8 border border-gold/10 shadow-sm mb-8">
+    <div class="flex flex-col md:flex-row items-center md:items-start gap-6">
+      
+      <div class="flex-shrink-0">
+        {% if profile_user.avatar %}
+          <img src="{{ profile_user.avatar.url }}" alt="{{ profile_user.username }}" 
+               class="w-24 h-24 rounded-full object-cover border-4 border-gold/20">
+        {% else %}
+          <div class="w-24 h-24 rounded-full bg-wine flex items-center justify-center text-cream text-3xl font-bold border-4 border-gold/20">
+            {{ profile_user.username|first|upper }}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="flex-1 text-center md:text-right">
+        <h1 class="text-2xl font-bold text-wine mb-1">{{ profile_user.get_display_name }}</h1>
+        <p class="text-sm text-ink/50 mb-3">@{{ profile_user.username }}</p>
+        
+        {% if profile_user.bio %}
+          <p class="text-sm text-ink/70 leading-relaxed mb-4">{{ profile_user.bio }}</p>
+        {% endif %}
+        
+        <div class="flex flex-wrap gap-3 text-xs text-ink/50 justify-center md:justify-start">
+          <span>📅 عضویت: {{ profile_user.created_at|date:"Y/m/d" }}</span>
+          {% if profile_user.favorite_genre %}
+            <span>🎭 {{ profile_user.favorite_genre }}</span>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if is_own_profile %}
+        <div class="flex-shrink-0">
+          <a href="{% url 'accounts:profile_edit' %}" 
+             class="bg-wine hover:bg-wineDark text-cream text-sm px-5 py-2.5 rounded-full transition inline-flex items-center gap-2">
+            ✏️ ویرایش
+          </a>
+        </div>
+        {% endif %}
+        {% if not is_own_profile and user.is_authenticated %}
+        <div class="flex-shrink-0">
+            <a href="{% url 'reports:report_user' profile_user.username %}" 
+            class="text-xs text-ink/40 hover:text-wine transition inline-flex items-center gap-1">
+            🚩 گزارش
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 pt-8 border-t border-gold/10">
+      <div class="text-center">
+        <p class="text-2xl font-bold text-wine">{{ stats.stories_count }}</p>
+        <p class="text-xs text-ink/50 mt-1">داستان</p>
+      </div>
+      <div class="text-center">
+        <p class="text-2xl font-bold text-wine">{{ stats.segments_count }}</p>
+        <p class="text-xs text-ink/50 mt-1">ادامه</p>
+      </div>
+      <div class="text-center">
+        <p class="text-2xl font-bold text-wine">{{ stats.votes_received }}</p>
+        <p class="text-xs text-ink/50 mt-1">رأی دریافتی</p>
+      </div>
+      <div class="text-center">
+        <p class="text-2xl font-bold text-wine">{{ stats.votes_given }}</p>
+        <p class="text-xs text-ink/50 mt-1">رأی داده</p>
+      </div>
+    </div>
+  </div>
+
+  {% if user_stories %}
+    <div class="mb-8">
+      <h2 class="text-xl font-bold text-wine mb-4">📚 داستان‌ها</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {% for story in user_stories %}
+          <a href="{{ story.get_absolute_url }}" 
+             class="bg-white rounded-2xl p-5 border border-gold/10 hover:shadow-md transition group">
+            {% if story.genre %}
+              <span class="inline-block text-xs bg-gold/15 text-wine px-2 py-0.5 rounded-full mb-3">{{ story.genre.name }}</span>
+            {% endif %}
+            <h3 class="font-bold text-ink mb-2 group-hover:text-wine transition leading-snug">{{ story.title }}</h3>
+            <div class="flex items-center justify-between text-xs text-ink/50 mt-3 pt-3 border-t border-gold/10">
+              <span>📖 {{ story.total_segments }}</span>
+              <span>❤️ {{ story.total_votes }}</span>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  {% if user_segments %}
+    <div>
+      <h2 class="text-xl font-bold text-wine mb-4">✍️ آخرین ادامه‌ها</h2>
+      <div class="space-y-3">
+        {% for segment in user_segments %}
+          <a href="{{ segment.story.get_absolute_url }}#segment-{{ segment.id }}" 
+             class="block bg-white rounded-2xl p-5 border border-gold/10 hover:shadow-md transition">
+            <p class="text-xs text-wine mb-2">در داستان «{{ segment.story.title }}»</p>
+            <p class="text-sm text-ink/70 leading-relaxed line-clamp-2">{{ segment.text }}</p>
+            <div class="flex items-center gap-3 text-xs text-ink/40 mt-3">
+              <span>{{ segment.created_at|timesince }} پیش</span>
+              <span>❤️ {{ segment.votes }} رأی</span>
+              {% if segment.is_canon %}<span class="text-gold">⭐ رسمی</span>{% endif %}
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  {% if not user_stories and not user_segments %}
+    <div class="text-center py-16 text-ink/50">
+      <div class="text-4xl mb-4">📖</div>
+      <p>هنوز فعالیتی ثبت نشده.</p>
+      {% if is_own_profile %}
+        <a href="{% url 'stories:create' %}" 
+           class="inline-block mt-4 bg-wine hover:bg-wineDark text-cream px-6 py-2.5 rounded-full text-sm transition">
+          اولین داستانت رو بنویس
+        </a>
+      {% endif %}
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

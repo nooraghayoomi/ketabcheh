@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}ویرایش پروفایل | کتابچه{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-6 py-12">
+  <div class="flex items-center justify-between mb-8">
+    <h1 class="text-2xl font-bold text-wine">ویرایش پروفایل</h1>
+    <a href="{% url 'accounts:profile' %}" class="text-sm text-ink/60 hover:text-wine">انصراف</a>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="mb-4 p-3 rounded-xl text-sm bg-red-50 text-red-700">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data" 
+        class="bg-white rounded-2xl p-6 md:p-8 border border-gold/10 shadow-sm space-y-5">
+    {% csrf_token %}
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-ink/80 mb-2">نام</label>
+        {{ form.first_name }}
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-ink/80 mb-2">نام خانوادگی</label>
+        {{ form.last_name }}
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-ink/80 mb-2">ایمیل</label>
+      {{ form.email }}
+      {% if form.email.errors %}<p class="text-xs text-red-600 mt-1">{{ form.email.errors.0 }}</p>{% endif %}
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-ink/80 mb-2">درباره من</label>
+      {{ form.bio }}
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-ink/80 mb-2">آواتار</label>
+      {% if user.avatar %}
+        <div class="mb-3">
+          <img src="{{ user.avatar.url }}" class="w-16 h-16 rounded-full object-cover border-2 border-gold/30">
+        </div>
+      {% endif %}
+      {{ form.avatar }}
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-ink/80 mb-2">تاریخ تولد</label>
+        {{ form.birth_date }}
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-ink/80 mb-2">ژانر محبوب</label>
+        {{ form.favorite_genre }}
+      </div>
+    </div>
+
+    <button type="submit" class="w-full bg-wine hover:bg-wineDark text-cream font-bold text-sm py-3.5 rounded-xl transition">
+      ذخیره تغییرات
+    </button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}گزارش {{ content_type }} | کتابچه{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-6 py-12">
+
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="text-2xl font-bold text-wine mb-1">🚩 گزارش {{ content_type }}</h1>
+      <p class="text-sm text-ink/60">گزارش: <span class="font-bold text-ink">{{ content_title }}</span></p>
+    </div>
+    <a href="{{ cancel_url }}" class="text-sm text-ink/60 hover:text-wine transition">انصراف</a>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="mb-4 p-3 rounded-xl text-sm 
+        {% if message.tags == 'error' %}bg-red-50 text-red-700
+        {% else %}bg-green-50 text-green-700{% endif %}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="bg-gold/5 border border-gold/20 rounded-2xl p-5 mb-6">
+    <p class="text-sm text-ink/70 leading-relaxed">
+      🙏 ممنون که به بهتر شدن کتابچه کمک می‌کنی. 
+      گزارش تو <strong>محرمانه</strong> می‌مونه و تیم ما بررسی‌اش می‌کنه.
+    </p>
+  </div>
+
+  <form method="post" class="bg-white rounded-2xl p-6 md:p-8 border border-gold/10 shadow-sm space-y-5">
+    {% csrf_token %}
+
+    <div>
+      <label class="block text-sm font-medium text-ink/80 mb-2">{{ form.reason.label }}</label>
+      {{ form.reason }}
+      {% if form.reason.errors %}<p class="text-xs text-red-600 mt-1">{{ form.reason.errors.0 }}</p>{% endif %}
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-ink/80 mb-2">{{ form.description.label }}</label>
+      {{ form.description }}
+    </div>
+
+    <div class="flex gap-3 pt-2">
+      <a href="{{ cancel_url }}" 
+         class="flex-1 text-center border border-gold/30 hover:bg-cream text-ink/70 text-sm py-3 rounded-xl transition">
+        انصراف
+      </a>
+      <button type="submit" 
+              class="flex-1 bg-wine hover:bg-wineDark text-cream font-bold text-sm py-3 rounded-xl transition">
+        ثبت گزارش
+      </button>
+    </div>
+  </form>
+
+</div>
+{% endblock %}

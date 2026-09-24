@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ story.title }} | کتابچه{% endblock %}
+
+{% block content %}
+
+<section class="bg-wine text-cream">
+  <div class="max-w-3xl mx-auto px-6 py-12">
+    {% if story.genre %}
+      <span class="inline-block text-xs bg-gold/20 text-gold px-3 py-1 rounded-full mb-4">{{ story.genre.name }}</span>
+    {% endif %}
+    <h1 class="text-3xl md:text-4xl font-bold mb-4">{{ story.title }}</h1>
+    {% if story.description %}
+      <p class="text-cream/80 mb-4">{{ story.description }}</p>
+    {% endif %}
+    <div class="flex flex-wrap items-center gap-4 text-xs text-cream/60">
+      <span>✍️ {{ story.author.username }}</span>
+      <span>📖 {{ canon_segments|length }} بخش</span>
+      <span>❤️ {{ story.total_votes }} رأی</span>
+      <span>👁️ {{ story.total_views }} بازدید</span>
+    </div>
+    <!-- لینک گزارش داستان -->
+    {% if user.is_authenticated and user != story.author %}
+    <div class="mt-4 text-center">
+        <a href="{% url 'reports:report_story' story.slug %}" 
+        class="text-xs text-ink/40 hover:text-wine transition inline-flex items-center gap-1">
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"/>
+        </svg>
+        گزارش داستان
+        </a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<main class="max-w-3xl mx-auto px-6 py-12">
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="mb-4 p-3 rounded-xl text-sm bg-green-50 text-green-700">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="space-y-6 mb-12">
+    {% for segment in canon_segments %}
+      <div id="segment-{{ segment.id }}" class="bg-white rounded-2xl p-6 md:p-8 border border-gold/10 shadow-sm">
+        <p class="text-ink/85 leading-loose whitespace-pre-line">{{ segment.text }}</p>
+        <div class="flex items-center justify-between mt-6 pt-4 border-t border-gold/10 text-xs text-ink/50">
+          <span>✍️ {{ segment.author.username }}</span>
+          <span>❤️ {{ segment.votes }} رأی</span>
+        </div>
+      </div>
+    {% empty %}
+      <div class="text-center py-12 text-ink/50"><p>هنوز بخشی نوشته نشده.</p></div>
+    {% endfor %}
+  </div>
+
+  {% if suggestions %}
+    <h2 class="text-xl font-bold text-wine mb-4">ادامه‌های پیشنهادی — رأی بده!</h2>
+    <div class="space-y-4 mb-12">
+      {% for segment in suggestions %}
+        <div id="segment-{{ segment.id }}" class="bg-cream/40 rounded-2xl p-6 border border-gold/20">
+          <p class="text-ink/80 leading-loose whitespace-pre-line mb-4">{{ segment.text }}</p>
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <span class="text-xs text-ink/50">✍️ {{ segment.author.username }}</span>
+            <div class="flex items-center gap-2">
+              {% if user.is_authenticated %}
+                <form method="post" action="{% url 'stories:vote' segment.id %}" class="inline">
+                  {% csrf_token %}
+                  <button type="submit" class="text-xs px-4 py-2 rounded-full transition
+                    {% if segment.id in user_votes %}bg-wine text-cream{% else %}border border-wine/30 text-wine hover:bg-wine hover:text-cream{% endif %}">
+                    {% if segment.id in user_votes %}❤️ رأی داده‌ای{% else %}🤍 رأی بده{% endif %} ({{ segment.votes }})
+                  </button>
+                    {% if user.is_authenticated and user != segment.author %}
+                        <a href="{% url 'reports:report_segment' segment.id %}" 
+                            class="text-xs text-ink/30 hover:text-wine transition p-2"
+                            title="گزارش">
+                            🚩
+                        </a>
+                        {% endif %}
+                </form>
+                {% if user == story.author %}
+                  <form method="post" action="{% url 'stories:select_canon' segment.id %}" class="inline">
+                    {% csrf_token %}
+                    <button type="submit" class="text-xs px-4 py-2 rounded-full bg-gold/20 text-wine hover:bg-gold transition">
+                      ⭐ انتخاب رسمی
+                    </button>
+                  </form>
+                {% endif %}
+              {% else %}
+                <a href="{% url 'accounts:login' %}?next={{ request.path }}" 
+                   class="text-xs px-4 py-2 rounded-full border border-wine/30 text-wine hover:bg-wine hover:text-cream transition">
+                  برای رأی وارد شو ({{ segment.votes }})
+                </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% if user.is_authenticated %}
+    <div class="bg-white rounded-2xl p-6 md:p-8 border border-gold/20 shadow-sm">
+      <h2 class="text-lg font-bold text-wine mb-4">✍️ ادامه‌ات رو بنویس</h2>
+      <form method="post" action="{% url 'stories:add_segment' story.slug %}">
+        {% csrf_token %}
+        {{ segment_form.text }}
+        <div class="flex items-center justify-between mt-4">
+        <div>
+            <span class="text-xs text-ink/40">حداقل ۲۰ حرف · حداکثر ۲۰۰۰ کاراکتر</span>
+            <span id="segment-counter" class="text-xs text-ink/40 mr-3">۰ حرف</span>
+        </div>
+        <button type="submit" class="bg-wine hover:bg-wineDark text-cream text-sm font-bold px-6 py-2.5 rounded-full transition">
+            ثبت ادامه
+        </button>
+        </div>
+      </form>
+    </div>
+  {% else %}
+    <div class="bg-wine/5 border border-wine/20 rounded-2xl p-6 text-center">
+      <p class="text-ink/70 mb-4">برای نوشتن ادامه، اول وارد شو.</p>
+      <a href="{% url 'accounts:login' %}?next={{ request.path }}" 
+         class="inline-block bg-wine hover:bg-wineDark text-cream text-sm px-6 py-2.5 rounded-full transition">
+        ورود / ثبت‌نام
+      </a>
+    </div>
+  {% endif %}
+
+</main>
+
+<script>
+  const segTextarea = document.querySelector('textarea[name="text"]');
+  if (segTextarea) {
+    const segCounter = document.getElementById('segment-counter');
+    const toPersian = (n) => n.toString().replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+    
+    function updateSegCounter() {
+      const text = segTextarea.value;
+      const letters = (text.match(/[a-zA-Zآ-یءأإؤئ]/g) || []).length;
+      
+      let color = 'text-ink/40';
+      if (letters >= 20) {
+        color = 'text-green-600';
+      } else if (letters > 0) {
+        color = 'text-amber-600';
+      }
+      
+      segCounter.className = `text-xs mr-3 ${color}`;
+      segCounter.textContent = `${toPersian(letters)} حرف`;
+    }
+    
+    segTextarea.addEventListener('input', updateSegCounter);
+    updateSegCounter();
+  }
+</script>
+
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}نوتیفیکیشن‌ها | کتابچه{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-6 py-12">
+
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="text-2xl font-bold text-wine">🔔 نوتیفیکیشن‌ها</h1>
+      {% if unread_count %}
+        <p class="text-xs text-ink/50 mt-1">{{ unread_count }} نوتیفیکیشن خوانده‌نشده</p>
+      {% endif %}
+    </div>
+    <div class="flex gap-2">
+      <a href="?unread=1" 
+         class="text-xs px-4 py-2 rounded-full transition
+           {% if unread_only %}bg-wine text-cream{% else %}border border-gold/30 text-ink/70 hover:border-wine{% endif %}">
+        خوانده‌نشده‌ها
+      </a>
+      {% if unread_count %}
+        <form method="post" action="{% url 'notifications:mark_all_read' %}" class="inline">
+          {% csrf_token %}
+          <button type="submit" class="text-xs px-4 py-2 rounded-full border border-gold/30 text-ink/70 hover:border-wine transition">
+            همه رو خواندم
+          </button>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if notifications %}
+    <div class="space-y-2">
+      {% for notif in notifications %}
+        <a href="{{ notif.url|default:'#' }}" 
+           class="block rounded-2xl p-4 border transition hover:shadow-sm
+             {% if notif.is_read %}bg-white border-gold/10{% else %}bg-gold/5 border-gold/30{% endif %}">
+          <div class="flex items-start gap-3">
+            <div class="flex-shrink-0">
+              {% if notif.sender.avatar %}
+                <img src="{{ notif.sender.avatar.url }}" class="w-10 h-10 rounded-full object-cover border border-gold/20">
+              {% else %}
+                <div class="w-10 h-10 rounded-full bg-wine flex items-center justify-center text-cream text-xs font-bold border border-gold/20">
+                  {{ notif.sender.username|first|upper|default:"؟" }}
+                </div>
+              {% endif %}
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-start gap-2 mb-1">
+                <span class="text-lg">
+                  {% if notif.notification_type == 'vote' %}❤️
+                  {% elif notif.notification_type == 'canon' %}⭐
+                  {% elif notif.notification_type == 'segment' %}✍️
+                  {% else %}🔔{% endif %}
+                </span>
+                <p class="text-sm text-ink/80 leading-relaxed">{{ notif.message }}</p>
+              </div>
+              <p class="text-xs text-ink/40 mt-1">{{ notif.created_at|timesince }} پیش</p>
+            </div>
+            {% if not notif.is_read %}
+              <div class="w-2 h-2 rounded-full bg-wine flex-shrink-0 mt-2"></div>
+            {% endif %}
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="text-center py-16 text-ink/50">
+      <div class="text-4xl mb-4">🔕</div>
+      <p>نوتیفیکیشنی نداری.</p>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

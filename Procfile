@@ -1,0 +1,1 @@
+web: gunicorn ketabcheh.wsgi --log-file -

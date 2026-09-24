@@ -1,0 +1,88 @@
+{% extends 'base.html' %} {% block title %}ثبت‌نام | کتابچه{% endblock %}
+{%block content %}
+
+<div class="min-h-screen flex items-center justify-center p-4">
+  <div
+    class="w-full max-w-md bg-white rounded-3xl shadow-xl p-8 border border-gold/10"
+  >
+    <h1 class="text-2xl font-bold text-wine mb-2 text-center">
+      به کتابچه بپیوند
+    </h1>
+    <p class="text-sm text-ink/60 mb-8 text-center">
+      یه حساب بساز و اولین داستانت رو شروع کن.
+    </p>
+
+    {% if messages %} {% for message in messages %}
+    <div
+      class="mb-4 p-3 rounded-xl text-sm bg-red-50 text-red-700 border border-red-200"
+    >
+      {{ message }}
+    </div>
+    {% endfor %} {% endif %}
+
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+
+      <div>
+        <label class="block text-sm font-medium text-ink/80 mb-2"
+          >{{ form.username.label }}</label
+        >
+        {{ form.username }} {% if form.username.errors %}
+        <p class="text-xs text-red-600 mt-1">{{ form.username.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-ink/80 mb-2"
+          >{{ form.email.label }}</label
+        >
+        {{ form.email }} {% if form.email.errors %}
+        <p class="text-xs text-red-600 mt-1">{{ form.email.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-ink/80 mb-2"
+          >{{ form.password1.label }}</label
+        >
+        {{ form.password1 }} {% if form.password1.errors %}
+        <p class="text-xs text-red-600 mt-1">{{ form.password1.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-ink/80 mb-2"
+          >{{ form.password2.label }}</label
+        >
+        {{ form.password2 }} {% if form.password2.errors %}
+        <p class="text-xs text-red-600 mt-1">{{ form.password2.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <label class="flex items-start gap-2 text-xs text-ink/60 cursor-pointer">
+        {{ form.terms }}
+        <span>با قوانین و شرایط موافقم.</span>
+      </label>
+      {% if form.terms.errors %}
+      <p class="text-xs text-red-600">{{ form.terms.errors.0 }}</p>
+      {% endif %}
+
+      <button
+        type="submit"
+        class="w-full bg-wine hover:bg-wineDark text-cream font-bold text-sm py-3.5 rounded-xl transition"
+      >
+        ساخت حساب
+      </button>
+    </form>
+
+    <p class="text-center text-sm text-ink/60 mt-6">
+      قبلاً ثبت‌نام کردی؟
+      <a
+        href="{% url 'accounts:login' %}"
+        class="text-wine font-bold hover:text-gold"
+        >وارد شو</a
+      >
+    </p>
+  </div>
+</div>
+{% endblock %}

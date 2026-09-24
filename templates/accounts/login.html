@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}ورود | کتابچه{% endblock %}
+
+{% block content %}
+
+<div class="min-h-screen flex items-center justify-center p-4">
+  <div class="w-full max-w-md bg-white rounded-3xl shadow-xl p-8 border border-gold/10">
+    
+    <h1 class="text-2xl font-bold text-wine mb-2 text-center">خوش برگشتی</h1>
+    <p class="text-sm text-ink/60 mb-8 text-center">وارد شو و ادامه داستان‌ها رو ببین.</p>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="mb-4 p-3 rounded-xl text-sm bg-red-50 text-red-700 border border-red-200">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ next }}">
+
+      <div>
+        <label class="block text-sm font-medium text-ink/80 mb-2">{{ form.username.label }}</label>
+        {{ form.username }}
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-ink/80 mb-2">{{ form.password.label }}</label>
+        {{ form.password }}
+      </div>
+
+      <label class="flex items-center gap-2 text-sm text-ink/70 cursor-pointer">
+        {{ form.remember_me }}
+        <span>{{ form.remember_me.label }}</span>
+      </label>
+
+      <button type="submit" class="w-full bg-wine hover:bg-wineDark text-cream font-bold text-sm py-3.5 rounded-xl transition">
+        ورود به حساب
+      </button>
+    </form>
+
+    <p class="text-center text-sm text-ink/60 mt-6">
+      حساب نداری؟ 
+      <a href="{% url 'accounts:signup' %}" class="text-wine font-bold hover:text-gold">ثبت‌نام کن</a>
+    </p>
+
+  </div>
+</div>
+
+{% endblock %}

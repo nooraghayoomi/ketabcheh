@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}داستان جدید | کتابچه{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-6 py-12">
+  <h1 class="text-2xl font-bold text-wine mb-2">داستان جدید</h1>
+  <p class="text-sm text-ink/60 mb-8">یه شروع جذاب بنویس تا بقیه ادامه‌اش بدن.</p>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="mb-4 p-3 rounded-xl text-sm bg-red-50 text-red-700">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="post" class="space-y-5 bg-white rounded-2xl p-6 md:p-8 border border-gold/10 shadow-sm">
+    {% csrf_token %}
+
+    <div>
+      <label class="block text-sm font-medium text-ink/80 mb-2">{{ form.title.label }}</label>
+      {{ form.title }}
+      {% if form.title.errors %}<p class="text-xs text-red-600 mt-1">{{ form.title.errors.0 }}</p>{% endif %}
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-ink/80 mb-2">{{ form.genre.label }}</label>
+      {{ form.genre }}
+      {% if form.genre.errors %}<p class="text-xs text-red-600 mt-1">{{ form.genre.errors.0 }}</p>{% endif %}
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-ink/80 mb-2">{{ form.description.label }}</label>
+      {{ form.description }}
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-ink/80 mb-2">
+        بخش اول داستان 
+        <span class="text-ink/40 font-normal">(حداقل ۵۰ حرف — بدون احتساب فاصله و علامت)</span>
+      </label>
+      <textarea name="first_segment" rows="8" maxlength="2000" required
+        placeholder="داستانت رو اینجا شروع کن..."
+        class="input-focus w-full bg-cream/50 border border-gold/30 rounded-xl px-4 py-3 text-sm resize-none"></textarea>
+      <p id="letter-counter" class="text-xs text-ink/40 mt-2">۰ حرف</p>
+    </div>
+
+    <button type="submit" class="w-full bg-wine hover:bg-wineDark text-cream font-bold text-sm py-3.5 rounded-xl transition">
+      شروع داستان
+    </button>
+  </form>
+</div>
+
+<script>
+  const textarea = document.querySelector('textarea[name="first_segment"]');
+  const counter = document.getElementById('letter-counter');
+  const toPersian = (n) => n.toString().replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+  
+  function updateCounter() {
+    const text = textarea.value;
+    const letters = (text.match(/[a-zA-Zآ-یءأإؤئ]/g) || []).length;
+    
+    let color = 'text-ink/40';
+    if (letters >= 50) {
+      color = 'text-green-600';
+    } else if (letters > 0) {
+      color = 'text-amber-600';
+    }
+    
+    counter.className = `text-xs mt-2 ${color}`;
+    counter.textContent = `${toPersian(letters)} حرف`;
+  }
+  
+  textarea.addEventListener('input', updateCounter);
+  updateCounter();
+</script>
+
+{% endblock %}
